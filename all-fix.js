@@ -6,39 +6,29 @@
                            window.location.pathname.endsWith("index.html") || 
                            window.location.pathname === "";
 
-        // 1. إصلاح المشغل الصوتي ليعتمد على الأرشيف مباشرة
+        // 1. إصلاح المشغل الصوتي وتحديد رابط الأرشيف المباشر
         const audioPlayer = document.querySelector('audio');
+        let mediaUrl = "";
+
         if (audioPlayer) {
             let currentSrc = audioPlayer.src || (audioPlayer.querySelector('source') ? audioPlayer.querySelector('source').src : "");
             if (currentSrc) {
                 const fileName = currentSrc.split('/').pop();
                 if (fileName && !currentSrc.includes('archive.org')) {
-                    const newArchiveUrl = ARCHIVE_BASE_URL + fileName;
-                    audioPlayer.src = newArchiveUrl;
+                    mediaUrl = ARCHIVE_BASE_URL + fileName;
+                    audioPlayer.src = mediaUrl;
                     const sourceTag = audioPlayer.querySelector('source');
-                    if (sourceTag) sourceTag.src = newArchiveUrl;
+                    if (sourceTag) sourceTag.src = mediaUrl;
                     audioPlayer.load();
+                } else {
+                    mediaUrl = currentSrc;
                 }
             }
         }
 
-        // 2. تعليقات الصفحة الرئيسية بالتصميم الجديد (أسود فاتح، كتابة بيضاء، ومربع أحمر)
-        if (isHomePage) {
-            if (!document.getElementById("main-comments-box")) {
-                const mainCommentsBox = document.createElement("div");
-                mainCommentsBox.id = "main-comments-box";
-                mainCommentsBox.style.cssText = "background: #222222; color: #ffffff; padding: 20px; border-radius: 12px; border: 2px solid #ff5252; margin: 25px auto; max-width: 600px; text-align: center; font-family: 'Cairo', sans-serif; box-shadow: 0 4px 15px rgba(0,0,0,0.5);";
-                mainCommentsBox.innerHTML = `
-                    <h3 style="margin-top:0; color:#ffffff; font-size:18px; margin-bottom: 10px;">💬 تعليقات زوار الأرشيف الباسمي</h3>
-                    <div style="color: #1a1a1a; font-weight: bold; font-size: 14px; margin-bottom: 15px; letter-spacing: 2px;">~~~~~ ~~~~~ ~~~~~</div>
-                    <iframe src="https://widgets.webynize.com/comments/iframe/13869" frameborder="0" width="100%" height="500px" style="border-radius: 8px; background: #1a1a1a;"></iframe>
-                `;
-                document.body.appendChild(mainCommentsBox);
-            }
-            return;
-        }
+        if (isHomePage) return;
 
-        // 3. زر العودة للرئيسية
+        // 2. زر العودة للرئيسية
         let backBtn = document.querySelector('.back-link, .btn-back, a[href*="index"], a[href="/"]');
         if (!backBtn) {
             backBtn = document.createElement("a");
@@ -49,7 +39,7 @@
             document.body.insertBefore(backBtn, document.body.firstChild);
         }
 
-        // 4. الإعلانات ومربع الترحيب
+        // 3. الإعلانات ومربع الترحيب
         if (!document.getElementById("top-ad-box")) {
             const topAdBox = document.createElement("div");
             topAdBox.id = "top-ad-box";
@@ -63,13 +53,13 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 5. زر التحميل والسمارت لينك
+        // 4. زر التحميل (فتح إعلانين وتنزيل الملف بنفس اللحظة)
         let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download"], a[download]');
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
             noticeBox.className = 'download-notice';
             noticeBox.style.cssText = "background-color: #222; border: 1px solid #ffd700; color: #fff; padding: 10px; border-radius: 8px; font-size: 13px; margin: 15px auto 8px auto; max-width: 500px; text-align: center; font-weight: bold; line-height: 1.6; font-family: 'Cairo', sans-serif;";
-            noticeBox.innerHTML = "عندما تضغط على زر التحميل سيتم تنزيل القصيدة وسينتقل الإعلان إلى تبويب آخر ❤<br>اغلقه وارجع للاستماع ❤";
+            noticeBox.innerHTML = "عندما تضغط على زر التحميل سيتم تنزيل القصيدة وسينتقلان الإعلانات إلى تبويبات أخرى ❤<br>اغلقهما وارجع للاستماع ❤";
             audioPlayer.parentNode.insertBefore(noticeBox, audioPlayer.nextSibling);
 
             downloadBtn = document.createElement("a");
@@ -83,17 +73,31 @@
         if (downloadBtn) {
             downloadBtn.addEventListener('click', function (e) {
                 e.preventDefault();
+
+                // 1. فتح الإعلان الأول
                 window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
-                let mediaUrl = audioPlayer ? (audioPlayer.src || (audioPlayer.querySelector('source') ? audioPlayer.querySelector('source').src : "")) : "";
+
+                // 2. فتح الإعلان الثاني بعد جزء من الثانية
+                setTimeout(() => {
+                    window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
+                }, 300);
+
+                // 3. تنزيل الملف بالخفاء بدون حظر
                 if (mediaUrl) {
                     setTimeout(() => {
-                        window.open(mediaUrl, '_blank');
-                    }, 500);
+                        const tempLink = document.createElement('a');
+                        tempLink.href = mediaUrl;
+                        tempLink.setAttribute('download', '');
+                        tempLink.target = '_blank';
+                        document.body.appendChild(tempLink);
+                        tempLink.click();
+                        document.body.removeChild(tempLink);
+                    }, 600);
                 }
             });
         }
 
-        // 6. تعليقات صفحات القصائد بالتصميم الجديد والمربع الأحمر
+        // 5. تعليقات صفحات القصائد بارتفاع 340px
         if (!document.getElementById("poem-comments-box")) {
             const bottomContainer = document.createElement("div");
             bottomContainer.id = "poem-comments-box";
