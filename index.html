@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="iA4ZKwJv9tvL0kEsGkDUdqhC6iMf7Ifqz8vaw8D1BeU" />
+    <title>الأرشيف الباسمي</title>
+    <style>
+        body {
+            font-family: 'Cairo', Tahoma, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        .header-banner {
+            width: 100%;
+            background-color: #000;
+            border-bottom: 3px solid #8b0000;
+            overflow: hidden;
+        }
+        .header-banner img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        
+        /* مربع الترحيب والدعم المعنوي */
+        .welcome-support-box {
+            background-color: #222222;
+            border: 1px solid #444;
+            color: #ff6b6b;
+            padding: 14px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 15px;
+            line-height: 1.8;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* قسم التعليقات بالرئيسية */
+        .comments-main-box {
+            background-color: #222222;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+        .comments-main-box h3 {
+            margin: 0 0 15px 0;
+            color: #ff6b6b;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        /* تلوين أداة Webynize بالـ CSS لتطابق الثيم الأسود والأحمر */
+        .wbnz-comments {
+            background-color: #1a1a1a !important;
+            color: #ffffff !important;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .wbnz-comments input, .wbnz-comments textarea {
+            background-color: #262626 !important;
+            color: #ffffff !important;
+            border: 1px solid #444 !important;
+        }
+
+        .ad-box {
+            text-align: center;
+            margin: 15px 0;
+            width: 100%;
+            overflow: hidden;
+        }
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #444;
+            background-color: #262626;
+            color: #fff;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            text-align: right;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #222222;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+            color: #ffffff;
+        }
+        th {
+            background-color: #8b0000;
+            color: white;
+        }
+        tbody tr {
+            background-color: #242424;
+        }
+        tbody tr:hover {
+            background-color: #2a2a2a;
+        }
+        .btn-show {
+            background-color: #8b0000;
+            color: white;
+            padding: 8px 14px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            display: inline-block;
+        }
+        .btn-show:hover {
+            background-color: #a00;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-banner">
+        <img src="banner.jpg" alt="الأرشيف الباسمي">
+    </div>
+
+    <div class="container">
+        
+        <!-- مربع الرسالة الترحيبية المعنوية -->
+        <div class="welcome-support-box">
+            🖤 دعمكم باستمراركم وتصفحكم هو سر نجاحنا واستمرارنا <br>
+            ✨ لإبقاء هذا الأرشيف متجدداً ومستمراً، شارك الموقع مع أصدقائك <br>
+            📌 سيتم إضافة المزيد من النوادر الباسمية ذات الجودة العالية بدعمكم ❤
+        </div>
+
+        <!-- قسم تعليقات Webynize بالصفحة الرئيسية (مفصول تماماً بـ id خاص) -->
+        <div class="comments-main-box">
+            <h3>💬 تعليقات زوار الأرشيف الباسمي</h3>
+            <div class='wbnz-comments' data-webynize-id='13869' data-page-id='home_page'></div>
+            <script defer src="https://app.webynize.com/js/comments.js"></script>
+        </div>
+
+        <!-- إعلان أدسترا بالصفحة الرئيسية -->
+        <div class="ad-box" id="main-ad-container"></div>
+
+        <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن اسم قصيدة، شاعر..." onkeyup="filterPoems()">
+
+        <!-- جدول القصائد -->
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="4" style="font-size: 18px; padding: 15px; background-color: #8b0000; color: white;">الأرشيف الباسمي</th>
+                </tr>
+                <tr style="background-color: #2c2c2c; color: #fff;">
+                    <th>#</th>
+                    <th>اسم القصيدة</th>
+                    <th>الشاعر</th>
+                    <th>عرض الكلمات</th>
+                </tr>
+            </thead>
+            <tbody id="poemsTableBody">
+                <!-- راح تنزل القصائد هنا تلقائياً من ملف poems.json -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // حقن إعلان الصفحة الرئيسية داخل iframe
+        window.addEventListener('DOMContentLoaded', () => {
+            const adContainer = document.getElementById('main-ad-container');
+            if (adContainer) {
+                const iframe = document.createElement('iframe');
+                iframe.width = '468';
+                iframe.height = '60';
+                iframe.frameBorder = '0';
+                iframe.scrolling = 'no';
+                
+                const adHtml = `
+                    <body style="margin:0;padding:0;text-align:center;">
+                        <script>
+                            atOptions = {
+                                'key' : '8de5765caba9eac6b17ebb6fd0feee77',
+                                'format' : 'iframe',
+                                'height' : 60,
+                                'width' : 468,
+                                'params' : {}
+                            };
+                        <\/script>
+                        <script src="https://bauval.org/22/8de5765caba9eac6b17ebb6fd0feee77"><\/script>
+                    </body>
+                `;
+                adContainer.appendChild(iframe);
+                const iframeDoc = iframe.contentWindow.document;
+                iframeDoc.open();
+                iframeDoc.write(adHtml);
+                iframeDoc.close();
+            }
+        });
+
+        let allPoems = [];
+
+        fetch('poems.json')
+            .then(response => response.json())
+            .then(data => {
+                allPoems = data;
+                renderPoems(allPoems);
+            })
+            .catch(error => {
+                console.error('خطأ:', error);
+            });
+
+        function renderPoems(poems) {
+            const tbody = document.getElementById('poemsTableBody');
+            tbody.innerHTML = '';
+            poems.forEach((poem, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td style="color: #ff6b6b; font-weight: bold;">${poem.title}</td>
+                    <td>${poem.poet}</td>
+                    <td><a href="${poem.url}" class="btn-show">عرض الكلمات</a></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterPoems() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtered = allPoems.filter(p => 
+                p.title.toLowerCase().includes(query) || 
+                p.poet.toLowerCase().includes(query)
+            );
+            renderPoems(filtered);
+        }
+    </script>
+</body>
+</html>
