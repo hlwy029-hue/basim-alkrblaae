@@ -1,33 +1,56 @@
 (function () {
-    // 🔗 رابط الأرشيف الموحد الشامل لجميع القصائد
     const ARCHIVE_BASE_URL = "https://archive.org/download/9_20261019_20261019_1439/";
+
+    // تحميل سكريبت التعليقات مبكراً وبشكل أصولي بالصفحة
+    if (!document.querySelector('script[src*="webynize"]')) {
+        const wbnzScript = document.createElement('script');
+        wbnzScript.src = "https://app.webynize.com/js/comments.js";
+        wbnzScript.async = true;
+        document.head.appendChild(wbnzScript);
+    }
 
     function initFixes() {
         const isHomePage = window.location.pathname === "/" || 
                            window.location.pathname.endsWith("index.html") || 
                            window.location.pathname === "";
 
-        if (isHomePage) return; 
-
-        // 0. ربط وتعديل رابط المشغل الصوتي ليعتمد على الأرشيف تلقائياً
+        // 1. إصلاح المشغل الصوتي ورابط الأرشيف
         const audioPlayer = document.querySelector('audio');
         if (audioPlayer) {
             let currentSrc = audioPlayer.src || (audioPlayer.querySelector('source') ? audioPlayer.querySelector('source').src : "");
-            
             if (currentSrc) {
-                // استخراج اسم الملف فقط (مثال: 10.m4a)
                 const fileName = currentSrc.split('/').pop();
                 if (fileName && !currentSrc.includes('archive.org')) {
                     const newArchiveUrl = ARCHIVE_BASE_URL + fileName;
                     audioPlayer.src = newArchiveUrl;
                     const sourceTag = audioPlayer.querySelector('source');
                     if (sourceTag) sourceTag.src = newArchiveUrl;
-                    audioPlayer.load(); // إعادة تحميل المشغل بالرابط الجديد
+                    audioPlayer.load();
                 }
             }
         }
 
-        // 1. زر العودة للرئيسية بالقمة
+        if (isHomePage) {
+            // قسم تعليقات الصفحة الرئيسية
+            if (!document.getElementById("main-comments")) {
+                const mainCommentsBox = document.createElement("div");
+                mainCommentsBox.id = "main-comments";
+                mainCommentsBox.style.cssText = "background: #222222; color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #333; margin: 20px auto; max-width: 600px; text-align: center; font-family: 'Cairo', sans-serif;";
+                mainCommentsBox.innerHTML = `
+                    <h3 style="margin-top:0; color:#ff6b6b; font-size:18px; margin-bottom: 15px;">💬 تعليقات زوار الأرشيف الباسمي</h3>
+                    <div class='wbnz-comments' data-webynize-id='13869' data-page-id='index_main'></div>
+                `;
+                const topNotice = document.querySelector('div[style*="background-color: #222222"]');
+                if (topNotice && topNotice.parentNode) {
+                    topNotice.parentNode.insertBefore(mainCommentsBox, topNotice.nextSibling);
+                } else {
+                    document.body.appendChild(mainCommentsBox);
+                }
+            }
+            return;
+        }
+
+        // 2. زر العودة للرئيسية
         let backBtn = document.querySelector('.back-link, .btn-back, a[href*="index"], a[href="/"]');
         if (!backBtn) {
             backBtn = document.createElement("a");
@@ -38,7 +61,7 @@
             document.body.insertBefore(backBtn, document.body.firstChild);
         }
 
-        // 2. إعداد إعلان البانر العلوي
+        // 3. إعلان البانر العلوي ومربع الدعم
         if (!document.getElementById("top-ad-box")) {
             const topAdBox = document.createElement("div");
             topAdBox.id = "top-ad-box";
@@ -46,16 +69,14 @@
             topAdBox.innerHTML = '<iframe width="468" height="60" frameborder="0" scrolling="no" srcdoc="<body style=\'margin:0;padding:0;text-align:center;\'><script>atOptions = {\x27key\x27:\x278de5765caba9eac6b17ebb6fd0feee77\x27,\x27format\x27:\x27iframe\x27,\x27height\x27:60,\x27width\x27:468,\x27params\x27:{}};</script><script src=\x27https://bauval.org/22/8de5765caba9eac6b17ebb6fd0feee77\x27></script></body>"></iframe>';
             backBtn.parentNode.insertBefore(topAdBox, backBtn.nextSibling);
 
-            // 3. مربع الترحيبات
             const welcomeBox = document.createElement("div");
             welcomeBox.style.cssText = "background-color: #222222; border: 1px solid #444; color: #ff6b6b; padding: 14px; border-radius: 8px; text-align: center; margin: 15px auto; max-width: 600px; font-weight: bold; font-size: 15px; line-height: 1.8; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-family: 'Cairo', sans-serif;";
             welcomeBox.innerHTML = "🖤 دعمكم باستمراركم وتصفحكم هو سر نجاحنا واستمرارنا <br>✨ لإبقاء هذا الأرشيف متجدداً ومستمراً، شارك الموقع مع أصدقائك <br>📌 سيتم إضافة المزيد من النوادر الباسمية ذات الجودة العالية بدعمكم ❤";
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 4. زر التحميل والتنبيه تحت المشغل الصوتي مع إصلاح عملية التحميل الفعلي والسمارت لينك
+        // 4. زر التحميل والسمارت لينك
         let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download"], a[download]');
-
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
             noticeBox.className = 'download-notice';
@@ -74,17 +95,8 @@
         if (downloadBtn) {
             downloadBtn.addEventListener('click', function (e) {
                 e.preventDefault();
-
-                // 1. فتح رابط السمارت لينك بتبويب جديد
                 window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
-
-                // 2. استخراج رابط الصوت المباشر من الأرشيف
-                let mediaUrl = "";
-                if (audioPlayer) {
-                    mediaUrl = audioPlayer.src || (audioPlayer.querySelector('source') ? audioPlayer.querySelector('source').src : "");
-                }
-
-                // 3. تنفيذ التنزيل الفعلي للملف
+                let mediaUrl = audioPlayer ? (audioPlayer.src || (audioPlayer.querySelector('source') ? audioPlayer.querySelector('source').src : "")) : "";
                 if (mediaUrl) {
                     const tempLink = document.createElement('a');
                     tempLink.href = mediaUrl;
@@ -97,26 +109,13 @@
             });
         }
 
-        // 5. قسم التعليقات (Webynize) الديناميكي لكل قصيدة مع التلوين وإعلان الأسفل
+        // 5. قسم التعليقات داخل صفحات القصائد
         if (!document.getElementById("poem-comments")) {
-            const currentPageId = window.location.pathname; 
+            const currentPageId = window.location.pathname.replace(/[^a-zA-Z0-9]/g, '_'); 
 
             const bottomContainer = document.createElement("div");
             bottomContainer.style.cssText = "margin: 30px auto 20px auto; max-width: 600px; padding: 15px; font-family: 'Cairo', sans-serif; text-align: center;";
             bottomContainer.innerHTML = `
-                <style>
-                    .wbnz-comments {
-                        background-color: #1a1a1a !important;
-                        color: #ffffff !important;
-                        border-radius: 8px;
-                        padding: 10px;
-                    }
-                    .wbnz-comments input, .wbnz-comments textarea {
-                        background-color: #262626 !important;
-                        color: #ffffff !important;
-                        border: 1px solid #444 !important;
-                    }
-                </style>
                 <div id="poem-comments" style="background: #222222; color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.4); margin-bottom: 20px;">
                     <h3 style="margin-top:0; color:#ff6b6b; font-size:18px; margin-bottom: 15px;">💬 شاركنا رأيك بالقصيدة</h3>
                     <div class='wbnz-comments' data-webynize-id='13869' data-page-id='${currentPageId}'></div>
@@ -126,13 +125,6 @@
                 </div>
             `;
             document.body.appendChild(bottomContainer);
-
-            if (!document.querySelector('script[src*="webynize"]')) {
-                const wbnzScript = document.createElement('script');
-                wbnzScript.src = "https://app.webynize.com/js/comments.js";
-                wbnzScript.defer = true;
-                document.body.appendChild(wbnzScript);
-            }
         }
     }
 
