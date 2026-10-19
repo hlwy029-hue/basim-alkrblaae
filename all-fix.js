@@ -6,29 +6,32 @@
                            window.location.pathname.endsWith("index.html") || 
                            window.location.pathname === "";
 
-        // 1. ربط المشغل الصوتي بالأرشيف الأونلاين بلطف
-        const audioPlayer = document.querySelector('audio');
-        let mediaUrl = "";
-
-        if (audioPlayer) {
-            let currentSrc = audioPlayer.src || (audioPlayer.querySelector('source') ? audioPlayer.querySelector('source').src : "");
-            if (currentSrc) {
-                const fileName = currentSrc.split('/').pop();
-                if (fileName) {
-                    mediaUrl = ARCHIVE_BASE_URL + fileName;
-                    audioPlayer.src = mediaUrl;
-                    const sourceTag = audioPlayer.querySelector('source');
-                    if (sourceTag) sourceTag.src = mediaUrl;
-                    audioPlayer.load();
-                }
-            }
-        } else {
-            const pathParts = window.location.pathname.split('/');
-            const pageName = pathParts[pathParts.length - 1].replace('.html', '.m4a');
-            mediaUrl = ARCHIVE_BASE_URL + pageName;
-        }
-
         if (isHomePage) return;
+
+        // استخراج اسم الصفحة الحالية بدقة (مثلاً 2.html أو shlon.html) لربطه بصيغة مخصصة
+        const pathParts = window.location.pathname.split('/');
+        let currentPage = pathParts[pathParts.length - 1];
+        
+        // هنا نقدر نربط اسم الصفحة مباشرة باسم الملف الصوتي الصحيح بالأرشيف
+        // (حتى لو اسم القصيدة بالإنكليزي أو رقم، نضمن يشتغلط طلقة)
+        let audioFileName = currentPage.replace('.html', '.m4a');
+        let mediaUrl = ARCHIVE_BASE_URL + audioFileName;
+
+        // 1. إصلاح المشغل الصوتي والتأكد من ربطه بالرابط الصحيح
+        const audioPlayer = document.querySelector('audio');
+        if (audioPlayer) {
+            audioPlayer.src = mediaUrl;
+            const sourceTag = audioPlayer.querySelector('source');
+            if (sourceTag) {
+                sourceTag.src = mediaUrl;
+            } else {
+                const newSource = document.createElement('source');
+                newSource.src = mediaUrl;
+                newSource.type = 'audio/m4a';
+                audioPlayer.appendChild(newSource);
+            }
+            audioPlayer.load();
+        }
 
         // 2. زر العودة للرئيسية
         let backBtn = document.querySelector('.back-link, .btn-back, a[href*="index"], a[href="/"]');
@@ -55,7 +58,7 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 4. زر التحميل الأحمر (إعلانين + تنزيل مباشر بدون مغادرة الموقع ولا شاشة سودة)
+        // 4. زر التحميل الأحمر (فتح إعلانين + بدء تنزيل الملف المباشر بدون شاشة سودة)
         let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download'], a[download]');
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
@@ -76,31 +79,28 @@
             downloadBtn.addEventListener('click', function (e) {
                 e.preventDefault();
 
-                // 1. فتح الإعلان الأول في تبويب جديد
+                // 1. فتح الإعلان الأول
                 window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
 
-                // 2. فتح الإعلان الثاني في تبويب جديد (لمضاعفة الأرباح)[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)
+                // 2. فتح الإعلان الثاني لزيادة الأرباح[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)
                 setTimeout(() => {
                     window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
                 }, 300);
 
-                // 3. تنزيل الملف بالخفاء بدون ما تتغير الصفحة الحالية ولا تطلع شاشة سودة
-                if (mediaUrl) {
-                    setTimeout(() => {
-                        const a = document.createElement('a');
-                        a.href = mediaUrl;
-                        a.download = mediaUrl.split('/').pop();
-                        // نستخدم الـ attribute لتجبار المتصفح على التحميل الخفي
-                        a.setAttribute('target', '_blank');
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                    }, 600);
-                }
+                // 3. التنزيل المباشر بالخفاء بدون شاشة سودة
+                setTimeout(() => {
+                    const tempLink = document.createElement('a');
+                    tempLink.href = mediaUrl;
+                    tempLink.setAttribute('download', audioFileName);
+                    tempLink.setAttribute('target', '_blank');
+                    document.body.appendChild(tempLink);
+                    tempLink.click();
+                    document.body.removeChild(tempLink);
+                }, 600);
             });
         }
 
-        // 5. تعليقات صفحات القصائد بارتفاع 340px المضبوط
+        // 5. تعليقات صفحات القصائد بارتفاع 340px
         if (!document.getElementById("poem-comments-box")) {
             const bottomContainer = document.createElement("div");
             bottomContainer.id = "poem-comments-box";
