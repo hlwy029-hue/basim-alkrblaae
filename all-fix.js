@@ -8,28 +8,15 @@
 
         if (isHomePage) return;
 
-        // 1. إعادة ربط مشغل الصوت بالطريقة الأصلية السليمة حتى يشتغل بدون أخطاء
+        // التقاط رابط الصوت الموجود أصلاً بالصفحة (بدون تعديل حتى يبقى يشتغل مثل الأول)
         const audioPlayer = document.querySelector('audio');
         let mediaUrl = "";
-
         if (audioPlayer) {
             let sourceTag = audioPlayer.querySelector('source');
-            let currentSrc = audioPlayer.src || (sourceTag ? sourceTag.src : "");
-            
-            if (currentSrc) {
-                const fileName = currentSrc.split('/').pop();
-                if (fileName) {
-                    mediaUrl = ARCHIVE_BASE_URL + fileName;
-                    audioPlayer.src = mediaUrl;
-                    if (sourceTag) {
-                        sourceTag.src = mediaUrl;
-                    }
-                    audioPlayer.load();
-                }
-            }
+            mediaUrl = audioPlayer.src || (sourceTag ? sourceTag.src : "");
         }
 
-        // 2. زر العودة للرئيسية
+        // 1. زر العودة للرئيسية
         let backBtn = document.querySelector('.back-link, .btn-back, a[href*="index"], a[href="/"]');
         if (!backBtn) {
             backBtn = document.createElement("a");
@@ -40,7 +27,7 @@
             document.body.insertBefore(backBtn, document.body.firstChild);
         }
 
-        // 3. الإعلانات ومربع الترحيب
+        // 2. الإعلانات ومربع الترحيب
         if (!document.getElementById("top-ad-box")) {
             const topAdBox = document.createElement("div");
             topAdBox.id = "top-ad-box";
@@ -54,8 +41,8 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 4. زر التحميل الأحمر (يفتح إعلانين لزيادة الأرباح + ينزل القصيدة مباشرة)
-        let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download'], a[download]');
+        // 3. زر التحميل الأحمر (يفتح إعلانين + ينزل الملف مباشرة)
+        let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download"], a[download]');
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
             noticeBox.className = 'download-notice';
@@ -83,7 +70,7 @@
                     window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
                 }, 300);
 
-                // التنزيل المباشر للقصيدة
+                // التحميل المباشر
                 if (mediaUrl) {
                     setTimeout(() => {
                         const tempLink = document.createElement('a');
@@ -98,7 +85,7 @@
             });
         }
 
-        // 5. تعليقات صفحات القصائد بارتفاع 340px
+        // 4. تعليقات صفحات القصائد بارتفاع 340px
         if (!document.getElementById("poem-comments-box")) {
             const bottomContainer = document.createElement("div");
             bottomContainer.id = "poem-comments-box";
