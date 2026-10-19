@@ -8,29 +8,26 @@
 
         if (isHomePage) return;
 
-        // استخراج اسم الصفحة الحالية بدقة (مثلاً 2.html أو shlon.html) لربطه بصيغة مخصصة
-        const pathParts = window.location.pathname.split('/');
-        let currentPage = pathParts[pathParts.length - 1];
-        
-        // هنا نقدر نربط اسم الصفحة مباشرة باسم الملف الصوتي الصحيح بالأرشيف
-        // (حتى لو اسم القصيدة بالإنكليزي أو رقم، نضمن يشتغلط طلقة)
-        let audioFileName = currentPage.replace('.html', '.m4a');
-        let mediaUrl = ARCHIVE_BASE_URL + audioFileName;
-
-        // 1. إصلاح المشغل الصوتي والتأكد من ربطه بالرابط الصحيح
+        // 1. المشغل الصوتي: نلتقط الرابط القديم أو اسم الملف الأصلي المكتوب بالصفحة ونربطه بالأرشيف بدقة
         const audioPlayer = document.querySelector('audio');
+        let mediaUrl = "";
+
         if (audioPlayer) {
-            audioPlayer.src = mediaUrl;
-            const sourceTag = audioPlayer.querySelector('source');
-            if (sourceTag) {
-                sourceTag.src = mediaUrl;
-            } else {
-                const newSource = document.createElement('source');
-                newSource.src = mediaUrl;
-                newSource.type = 'audio/m4a';
-                audioPlayer.appendChild(newSource);
+            let sourceTag = audioPlayer.querySelector('source');
+            let currentSrc = audioPlayer.src || (sourceTag ? sourceTag.src : "");
+            
+            if (currentSrc) {
+                // نأخذ اسم الملف الأصلي حصراً (مثلاً 1.m4a أو al-ilm.m4a) ونلصقه برابط الأرشيف الصح
+                const fileName = currentSrc.split('/').pop();
+                if (fileName && fileName.includes('.')) {
+                    mediaUrl = ARCHIVE_BASE_URL + fileName;
+                    audioPlayer.src = mediaUrl;
+                    if (sourceTag) {
+                        sourceTag.src = mediaUrl;
+                    }
+                    audioPlayer.load();
+                }
             }
-            audioPlayer.load();
         }
 
         // 2. زر العودة للرئيسية
@@ -58,7 +55,7 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 4. زر التحميل الأحمر (فتح إعلانين + بدء تنزيل الملف المباشر بدون شاشة سودة)
+        // 4. زر التحميل الأحمر (إعلانين + تحميل مباشر بالخفاء وبدون أي شاشة سودة)
         let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download'], a[download]');
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
@@ -79,24 +76,26 @@
             downloadBtn.addEventListener('click', function (e) {
                 e.preventDefault();
 
-                // 1. فتح الإعلان الأول
+                // فتح الإعلان الأول
                 window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
 
-                // 2. فتح الإعلان الثاني لزيادة الأرباح[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)
+                // فتح الإعلان الثاني لزيادة الأرباح[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)
                 setTimeout(() => {
                     window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
                 }, 300);
 
-                // 3. التنزيل المباشر بالخفاء بدون شاشة سودة
-                setTimeout(() => {
-                    const tempLink = document.createElement('a');
-                    tempLink.href = mediaUrl;
-                    tempLink.setAttribute('download', audioFileName);
-                    tempLink.setAttribute('target', '_blank');
-                    document.body.appendChild(tempLink);
-                    tempLink.click();
-                    document.body.removeChild(tempLink);
-                }, 600);
+                // التحميل المباشر الخفي للقصيدة الحالية
+                if (mediaUrl) {
+                    setTimeout(() => {
+                        const tempLink = document.createElement('a');
+                        tempLink.href = mediaUrl;
+                        tempLink.setAttribute('download', '');
+                        tempLink.setAttribute('target', '_blank');
+                        document.body.appendChild(tempLink);
+                        tempLink.click();
+                        document.body.removeChild(tempLink);
+                    }, 600);
+                }
             });
         }
 
