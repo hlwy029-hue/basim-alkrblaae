@@ -1,6 +1,4 @@
 (function () {
-    const ARCHIVE_BASE_URL = "https://archive.org/download/9_20261019_20261019_1439/";
-
     function initFixes() {
         const isHomePage = window.location.pathname === "/" || 
                            window.location.pathname.endsWith("index.html") || 
@@ -8,29 +6,16 @@
 
         if (isHomePage) return;
 
-        // استخراج اسم الصفحة وربطه مباشرة برابط الأرشيف الثابت حتى يشتغل الصوت 100%
-        const pathParts = window.location.pathname.split('/');
-        let currentPage = pathParts[pathParts.length - 1];
-        let audioFileName = currentPage.replace('.html', '.m4a');
-        let mediaUrl = ARCHIVE_BASE_URL + audioFileName;
-
-        // 1. ربط مشغل الصوت بالرابط الصحيح فوراً
+        // التقاط رابط الصوت الأصلي المكتوب داخل صفحة الـ HTML لكل قصيدة بدقة 100%
         const audioPlayer = document.querySelector('audio');
+        let mediaUrl = "";
+        
         if (audioPlayer) {
-            audioPlayer.src = mediaUrl;
             let sourceTag = audioPlayer.querySelector('source');
-            if (sourceTag) {
-                sourceTag.src = mediaUrl;
-            } else {
-                const newSource = document.createElement('source');
-                newSource.src = mediaUrl;
-                newSource.type = 'audio/m4a';
-                audioPlayer.appendChild(newSource);
-            }
-            audioPlayer.load();
+            mediaUrl = audioPlayer.src || (sourceTag ? sourceTag.src : "");
         }
 
-        // 2. زر العودة للرئيسية
+        // 1. زر العودة للرئيسية
         let backBtn = document.querySelector('.back-link, .btn-back, a[href*="index"], a[href="/"]');
         if (!backBtn) {
             backBtn = document.createElement("a");
@@ -41,7 +26,7 @@
             document.body.insertBefore(backBtn, document.body.firstChild);
         }
 
-        // 3. الإعلانات ومربع الترحيب
+        // 2. الإعلانات ومربع الترحيب
         if (!document.getElementById("top-ad-box")) {
             const topAdBox = document.createElement("div");
             topAdBox.id = "top-ad-box";
@@ -55,7 +40,7 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 4. زر التحميل الأحمر (يفتح إعلانين لزيادة الأرباح + ينزل القصيدة مباشرة)
+        // 3. زر التحميل الأحمر (إعلانين + تحميل مباشر بدون شاشة سودة)
         let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download"], a[download]');
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
@@ -79,17 +64,17 @@
                 // فتح الإعلان الأول
                 window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
 
-                // فتح الإعلان الثاني لزيادة الأرباح[span_0](start_span)[span_0](end_span)[span_1](start_span)[span_1](end_span)
+                // فتح الإعلان الثاني لزيادة الأرباح[span_5](start_span)[span_5](end_span)[span_6](start_span)[span_6](end_span)
                 setTimeout(() => {
                     window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
                 }, 300);
 
-                // التنزيل المباشر للقصيدة
+                // التحميل المباشر للملف الصوتي الحقيقي الخاص بالقصيدة
                 if (mediaUrl) {
                     setTimeout(() => {
                         const tempLink = document.createElement('a');
                         tempLink.href = mediaUrl;
-                        tempLink.setAttribute('download', audioFileName);
+                        tempLink.setAttribute('download', '');
                         tempLink.setAttribute('target', '_blank');
                         document.body.appendChild(tempLink);
                         tempLink.click();
@@ -99,7 +84,7 @@
             });
         }
 
-        // 5. تعليقات صفحات القصائد بارتفاع 340px
+        // 4. تعليقات صفحات القصائد بارتفاع 340px
         if (!document.getElementById("poem-comments-box")) {
             const bottomContainer = document.createElement("div");
             bottomContainer.id = "poem-comments-box";
