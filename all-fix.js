@@ -102,7 +102,7 @@
                 <div style="background: #222222; color: #ffffff; padding: 20px; border-radius: 12px; border: 2px solid #ff5252; box-shadow: 0 4px 15px rgba(0,0,0,0.5); margin-bottom: 20px;">
                     <h3 style="margin-top:0; color:#ffffff; font-size:18px; margin-bottom: 10px;">💬 شاركنا رأيك بالقصيدة</h3>
                     <div style="color: #1a1a1a; font-weight: bold; font-size: 14px; margin-bottom: 15px; letter-spacing: 2px;">~~~~~ ~~~~~ ~~~~~</div>
-                    <iframe src="https://widgets.webynize.com/comments/iframe/13869" frameborder="0" width="100%" height="500px" style="border-radius: 8px; background: #1a1a1a;"></iframe>
+                    <iframe src="https://widgets.webynize.com/comments/iframe/13869" frameborder="0" width="100%" height="340px" style="border-radius: 8px; background: #1a1a1a;"></iframe>
                 </div>
                 <div style="text-align: center; margin: 25px auto; width: 100%; overflow: hidden;">
                     <iframe width="468" height="60" frameborder="0" scrolling="no" srcdoc="<body style=\'margin:0;padding:0;text-align:center;\'><script>atOptions = {\x27key\x27:\x278de5765caba9eac6b17ebb6fd0feee77\x27,\x27format\x27:\x27iframe\x27,\x27height\x27:60,\x27width\x27:468,\x27params\x27:{}};</script><script src=\x27https://bauval.org/22/8de5765caba9eac6b17ebb6fd0feee77\x27></script></body>"></iframe>
