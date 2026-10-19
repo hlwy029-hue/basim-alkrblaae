@@ -1,10 +1,31 @@
 (function () {
+    // 🔗 رابط الأرشيف الموحد الشامل لجميع القصائد
+    const ARCHIVE_BASE_URL = "https://archive.org/download/9_20261019_20261019_1439/";
+
     function initFixes() {
         const isHomePage = window.location.pathname === "/" || 
                            window.location.pathname.endsWith("index.html") || 
                            window.location.pathname === "";
 
         if (isHomePage) return; 
+
+        // 0. ربط وتعديل رابط المشغل الصوتي ليعتمد على الأرشيف تلقائياً
+        const audioPlayer = document.querySelector('audio');
+        if (audioPlayer) {
+            let currentSrc = audioPlayer.src || (audioPlayer.querySelector('source') ? audioPlayer.querySelector('source').src : "");
+            
+            if (currentSrc) {
+                // استخراج اسم الملف فقط (مثال: 10.m4a)
+                const fileName = currentSrc.split('/').pop();
+                if (fileName && !currentSrc.includes('archive.org')) {
+                    const newArchiveUrl = ARCHIVE_BASE_URL + fileName;
+                    audioPlayer.src = newArchiveUrl;
+                    const sourceTag = audioPlayer.querySelector('source');
+                    if (sourceTag) sourceTag.src = newArchiveUrl;
+                    audioPlayer.load(); // إعادة تحميل المشغل بالرابط الجديد
+                }
+            }
+        }
 
         // 1. زر العودة للرئيسية بالقمة
         let backBtn = document.querySelector('.back-link, .btn-back, a[href*="index"], a[href="/"]');
@@ -32,8 +53,7 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 4. زر التحميل والتنبيه تحت المشغل الصوتي مع إصلاح عملية التحميل الفعلي
-        const audioPlayer = document.querySelector('audio');
+        // 4. زر التحميل والتنبيه تحت المشغل الصوتي مع إصلاح عملية التحميل الفعلي والسمارت لينك
         let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download"], a[download]');
 
         if (!downloadBtn && audioPlayer) {
@@ -53,39 +73,31 @@
 
         if (downloadBtn) {
             downloadBtn.addEventListener('click', function (e) {
-                e.preventDefault(); // منع السلوك الافتراضي المؤقت
+                e.preventDefault();
 
-                // 1. فتح إعلان السمارت لينك في تبويب جديد
+                // 1. فتح رابط السمارت لينك بتبويب جديد
                 window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
 
-                // 2. سحب رابط الملف الصوتي الحقيقي وبدء التحميل الفعلي
+                // 2. استخراج رابط الصوت المباشر من الأرشيف
                 let mediaUrl = "";
                 if (audioPlayer) {
-                    if (audioPlayer.src) {
-                        mediaUrl = audioPlayer.src;
-                    } else {
-                        const sourceTag = audioPlayer.querySelector('source');
-                        if (sourceTag && sourceTag.src) {
-                            mediaUrl = sourceTag.src;
-                        }
-                    }
+                    mediaUrl = audioPlayer.src || (audioPlayer.querySelector('source') ? audioPlayer.querySelector('source').src : "");
                 }
 
+                // 3. تنفيذ التنزيل الفعلي للملف
                 if (mediaUrl) {
                     const tempLink = document.createElement('a');
                     tempLink.href = mediaUrl;
                     tempLink.setAttribute('download', '');
+                    tempLink.target = '_blank';
                     document.body.appendChild(tempLink);
                     tempLink.click();
                     document.body.removeChild(tempLink);
-                } else {
-                    // حل احتياطي لو الرابط مو موجود بالمشغل مباشرة
-                    alert("جاري بدء التحميل...");
                 }
             });
         }
 
-        // 5. قسم التعليقات (Webynize) الديناميكي لكل قصيدة
+        // 5. قسم التعليقات (Webynize) الديناميكي لكل قصيدة مع التلوين وإعلان الأسفل
         if (!document.getElementById("poem-comments")) {
             const currentPageId = window.location.pathname; 
 
