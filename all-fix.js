@@ -1,5 +1,4 @@
 (function () {
-    // رابط الأرشيف الأساسي الموحد لكل القصائد اللي نشرتهن
     const ARCHIVE_BASE_URL = "https://archive.org/download/9_20261019_20261019_1439/";
 
     function initFixes() {
@@ -7,10 +6,7 @@
                            window.location.pathname.endsWith("index.html") || 
                            window.location.pathname === "";
 
-        // إذا كنا بالصفحة الرئيسية، نطلع حتى ما نتلاعب بشغل القوائم والجدول
-        if (isHomePage) return;
-
-        // 1. ربط المشغل الصوتي بملفات الأرشيف الأونلاين تلقائياً
+        // 1. ربط المشغل الصوتي بالأرشيف الأونلاين
         const audioPlayer = document.querySelector('audio');
         let mediaUrl = "";
 
@@ -27,11 +23,12 @@
                 }
             }
         } else {
-            // كاحتياط لو ماكو وسم audio مباشر، نأخذ اسم الصفحة الحالية ونربطه بالأرشيف
             const pathParts = window.location.pathname.split('/');
             const pageName = pathParts[pathParts.length - 1].replace('.html', '.m4a');
             mediaUrl = ARCHIVE_BASE_URL + pageName;
         }
+
+        if (isHomePage) return;
 
         // 2. زر العودة للرئيسية
         let backBtn = document.querySelector('.back-link, .btn-back, a[href*="index"], a[href="/"]');
@@ -58,7 +55,7 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 4. زر التحميل (يفتح إعلانين بتبويبات منفصلة + يباشر بتنزيل القصيدة من الأرشيف الأونلاين)
+        // 4. زر التحميل الأحمر (إعلانين + تنزيل مباشر بدون شاشة سودة وبقاء تبويب الأرشيف)
         let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download"], a[download]');
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
@@ -82,15 +79,20 @@
                 // 1. فتح الإعلان الأول
                 window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
 
-                // 2. فتح الإعلان الثاني بعد جزء من الثانية لزيادة الأرباح
+                // 2. فتح الإعلان الثاني بعد جزء من الثانية (لأجل الأرباح)[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)
                 setTimeout(() => {
                     window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
                 }, 300);
 
-                // 3. فتح تبويب التحميل المباشر للقصيدة من الأرشيف الأونلاين
+                // 3. بدء التنزيل المباشر بالخفاء بدون شاشة سودة ولا تبويب أرشيف مزعج
                 if (mediaUrl) {
                     setTimeout(() => {
-                        window.open(mediaUrl, '_blank');
+                        const tempLink = document.createElement('a');
+                        tempLink.href = mediaUrl;
+                        tempLink.setAttribute('download', '');
+                        document.body.appendChild(tempLink);
+                        tempLink.click();
+                        document.body.removeChild(tempLink);
                     }, 600);
                 }
             });
