@@ -6,7 +6,7 @@
                            window.location.pathname.endsWith("index.html") || 
                            window.location.pathname === "";
 
-        // 1. ربط المشغل الصوتي بالأرشيف الأونلاين
+        // 1. ربط المشغل الصوتي بالأرشيف الأونلاين بلطف
         const audioPlayer = document.querySelector('audio');
         let mediaUrl = "";
 
@@ -55,8 +55,8 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 4. زر التحميل الأحمر (إعلانين + تنزيل مباشر بدون شاشة سودة وبقاء تبويب الأرشيف)
-        let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download"], a[download]');
+        // 4. زر التحميل الأحمر (إعلانين + تنزيل مباشر بدون مغادرة الموقع ولا شاشة سودة)
+        let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download'], a[download]');
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
             noticeBox.className = 'download-notice';
@@ -76,23 +76,25 @@
             downloadBtn.addEventListener('click', function (e) {
                 e.preventDefault();
 
-                // 1. فتح الإعلان الأول
+                // 1. فتح الإعلان الأول في تبويب جديد
                 window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
 
-                // 2. فتح الإعلان الثاني بعد جزء من الثانية (لأجل الأرباح)[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)
+                // 2. فتح الإعلان الثاني في تبويب جديد (لمضاعفة الأرباح)[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)
                 setTimeout(() => {
                     window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
                 }, 300);
 
-                // 3. بدء التنزيل المباشر بالخفاء بدون شاشة سودة ولا تبويب أرشيف مزعج
+                // 3. تنزيل الملف بالخفاء بدون ما تتغير الصفحة الحالية ولا تطلع شاشة سودة
                 if (mediaUrl) {
                     setTimeout(() => {
-                        const tempLink = document.createElement('a');
-                        tempLink.href = mediaUrl;
-                        tempLink.setAttribute('download', '');
-                        document.body.appendChild(tempLink);
-                        tempLink.click();
-                        document.body.removeChild(tempLink);
+                        const a = document.createElement('a');
+                        a.href = mediaUrl;
+                        a.download = mediaUrl.split('/').pop();
+                        // نستخدم الـ attribute لتجبار المتصفح على التحميل الخفي
+                        a.setAttribute('target', '_blank');
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
                     }, 600);
                 }
             });
