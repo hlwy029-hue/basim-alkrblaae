@@ -46,33 +46,21 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        /* قسم التعليقات بالرئيسية */
+        /* قسم التعليقات بالرئيسية محدد بالمربع الأحمر والخط المتموج */
         .comments-main-box {
             background-color: #222222;
-            border: 1px solid #333;
-            border-radius: 10px;
-            padding: 15px;
+            color: #ffffff;
+            border: 2px solid #ff5252;
+            border-radius: 12px;
+            padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
         .comments-main-box h3 {
-            margin: 0 0 15px 0;
-            color: #ff6b6b;
+            margin: 0 0 10px 0;
+            color: #ffffff;
             font-size: 18px;
-            text-align: center;
-        }
-
-        /* تلوين أداة Webynize بالـ CSS لتطابق الثيم الأسود والأحمر */
-        .wbnz-comments {
-            background-color: #1a1a1a !important;
-            color: #ffffff !important;
-            border-radius: 8px;
-            padding: 10px;
-        }
-        .wbnz-comments input, .wbnz-comments textarea {
-            background-color: #262626 !important;
-            color: #ffffff !important;
-            border: 1px solid #444 !important;
         }
 
         .ad-box {
@@ -146,11 +134,11 @@
             📌 سيتم إضافة المزيد من النوادر الباسمية ذات الجودة العالية بدعمكم ❤
         </div>
 
-        <!-- قسم تعليقات Webynize بالصفحة الرئيسية (مفصول تماماً بـ id خاص) -->
+        <!-- قسم تعليقات الصفحة الرئيسية بالإطار المباشر (مضمون 100%) -->
         <div class="comments-main-box">
             <h3>💬 تعليقات زوار الأرشيف الباسمي</h3>
-            <div class='wbnz-comments' data-webynize-id='13869' data-page-id='home_page'></div>
-            <script defer src="https://app.webynize.com/js/comments.js"></script>
+            <div style="color: #1a1a1a; font-weight: bold; font-size: 14px; margin-bottom: 15px; letter-spacing: 2px;">~~~~~ ~~~~~ ~~~~~</div>
+            <iframe src="https://widgets.webynize.com/comments/iframe/13869" frameborder="0" width="100%" height="500px" style="border-radius: 8px; background: #1a1a1a;"></iframe>
         </div>
 
         <!-- إعلان أدسترا بالصفحة الرئيسية -->
@@ -172,11 +160,12 @@
                 </tr>
             </thead>
             <tbody id="poemsTableBody">
-                <!-- راح تنزل القصائد هنا تلقائياً من ملف poems.json -->
+                <!-- تنزل القصائد تلقائياً من ملف poems.json -->
             </tbody>
         </table>
     </div>
 
+    <script src="all-fix.js"></script>
     <script>
         // حقن إعلان الصفحة الرئيسية داخل iframe
         window.addEventListener('DOMContentLoaded', () => {
