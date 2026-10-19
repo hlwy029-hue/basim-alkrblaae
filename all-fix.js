@@ -8,7 +8,7 @@
 
         if (isHomePage) return;
 
-        // 1. المشغل الصوتي: نلتقط الرابط القديم أو اسم الملف الأصلي المكتوب بالصفحة ونربطه بالأرشيف بدقة
+        // 1. إعادة ربط مشغل الصوت بالطريقة الأصلية السليمة حتى يشتغل بدون أخطاء
         const audioPlayer = document.querySelector('audio');
         let mediaUrl = "";
 
@@ -17,9 +17,8 @@
             let currentSrc = audioPlayer.src || (sourceTag ? sourceTag.src : "");
             
             if (currentSrc) {
-                // نأخذ اسم الملف الأصلي حصراً (مثلاً 1.m4a أو al-ilm.m4a) ونلصقه برابط الأرشيف الصح
                 const fileName = currentSrc.split('/').pop();
-                if (fileName && fileName.includes('.')) {
+                if (fileName) {
                     mediaUrl = ARCHIVE_BASE_URL + fileName;
                     audioPlayer.src = mediaUrl;
                     if (sourceTag) {
@@ -55,7 +54,7 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 4. زر التحميل الأحمر (إعلانين + تحميل مباشر بالخفاء وبدون أي شاشة سودة)
+        // 4. زر التحميل الأحمر (يفتح إعلانين لزيادة الأرباح + ينزل القصيدة مباشرة)
         let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download'], a[download]');
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
@@ -79,12 +78,12 @@
                 // فتح الإعلان الأول
                 window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
 
-                // فتح الإعلان الثاني لزيادة الأرباح[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)
+                // فتح الإعلان الثاني لزيادة الأرباح
                 setTimeout(() => {
                     window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
                 }, 300);
 
-                // التحميل المباشر الخفي للقصيدة الحالية
+                // التنزيل المباشر للقصيدة
                 if (mediaUrl) {
                     setTimeout(() => {
                         const tempLink = document.createElement('a');
