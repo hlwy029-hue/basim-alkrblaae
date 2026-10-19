@@ -6,7 +6,7 @@
                            window.location.pathname.endsWith("index.html") || 
                            window.location.pathname === "";
 
-        // 1. إصلاح المشغل الصوتي وتحديد رابط الأرشيف المباشر
+        // 1. ربط المشغل الصوتي بالأرشيف بلطف وبدون مشاكل
         const audioPlayer = document.querySelector('audio');
         let mediaUrl = "";
 
@@ -53,51 +53,33 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 4. زر التحميل (فتح إعلانين وتنزيل الملف بنفس اللحظة)
+        // 4. زر التحميل (الآمن والمضمون 100%)
         let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download"], a[download]');
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
             noticeBox.className = 'download-notice';
             noticeBox.style.cssText = "background-color: #222; border: 1px solid #ffd700; color: #fff; padding: 10px; border-radius: 8px; font-size: 13px; margin: 15px auto 8px auto; max-width: 500px; text-align: center; font-weight: bold; line-height: 1.6; font-family: 'Cairo', sans-serif;";
-            noticeBox.innerHTML = "عندما تضغط على زر التحميل سيتم تنزيل القصيدة وسينتقلان الإعلانات إلى تبويبات أخرى ❤<br>اغلقهما وارجع للاستماع ❤";
+            noticeBox.innerHTML = "عندما تضغط على زر التحميل سيتم تنزيل القصيدة وسينتقل الإعلان إلى تبويب آخر ❤<br>اغلقه وارجع للاستماع ❤";
             audioPlayer.parentNode.insertBefore(noticeBox, audioPlayer.nextSibling);
 
             downloadBtn = document.createElement("a");
-            downloadBtn.href = "#";
             downloadBtn.className = "download-link";
             downloadBtn.innerHTML = "📥 تحميل القصيدة (M4A)";
             downloadBtn.style.cssText = "display: block; width: fit-content; margin: 10px auto 15px auto; background: #ff5252; color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-family: 'Cairo', sans-serif; text-align: center;";
             noticeBox.parentNode.insertBefore(downloadBtn, noticeBox.nextSibling);
         }
 
-        if (downloadBtn) {
-            downloadBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-
-                // 1. فتح الإعلان الأول
+        if (downloadBtn && mediaUrl) {
+            downloadBtn.href = mediaUrl;
+            downloadBtn.setAttribute('download', '');
+            
+            // عند الضغط يفتح إعلان واحد فقط بتبويب جديد، والملف يبدأ بالتحميل فوراً
+            downloadBtn.onclick = function () {
                 window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
-
-                // 2. فتح الإعلان الثاني بعد جزء من الثانية
-                setTimeout(() => {
-                    window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
-                }, 300);
-
-                // 3. تنزيل الملف بالخفاء بدون حظر
-                if (mediaUrl) {
-                    setTimeout(() => {
-                        const tempLink = document.createElement('a');
-                        tempLink.href = mediaUrl;
-                        tempLink.setAttribute('download', '');
-                        tempLink.target = '_blank';
-                        document.body.appendChild(tempLink);
-                        tempLink.click();
-                        document.body.removeChild(tempLink);
-                    }, 600);
-                }
-            });
+            };
         }
 
-        // 5. تعليقات صفحات القصائد بارتفاع 340px
+        // 5. تعليقات صفحات القصائد بارتفاع 340px المضبوط
         if (!document.getElementById("poem-comments-box")) {
             const bottomContainer = document.createElement("div");
             bottomContainer.id = "poem-comments-box";
