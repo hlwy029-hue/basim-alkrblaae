@@ -1,12 +1,15 @@
 (function () {
     const ARCHIVE_BASE_URL = "https://archive.org/download/9_20261019_20261019_1439/";
 
-    // تحميل سكريبت التعليقات مبكراً وبشكل أصولي بالصفحة
-    if (!document.querySelector('script[src*="webynize"]')) {
-        const wbnzScript = document.createElement('script');
-        wbnzScript.src = "https://app.webynize.com/js/comments.js";
-        wbnzScript.async = true;
-        document.head.appendChild(wbnzScript);
+    function loadWebynizeScript() {
+        if (!document.querySelector('script[src*="webynize"]')) {
+            const wbnzScript = document.createElement('script');
+            wbnzScript.src = "https://app.webynize.com/js/comments.js";
+            wbnzScript.async = true;
+            document.head.appendChild(wbnzScript);
+        } else if (window.Webynize && typeof window.Webynize.init === 'function') {
+            window.Webynize.init();
+        }
     }
 
     function initFixes() {
@@ -14,7 +17,7 @@
                            window.location.pathname.endsWith("index.html") || 
                            window.location.pathname === "";
 
-        // 1. إصلاح المشغل الصوتي ورابط الأرشيف
+        // 1. إصلاح المشغل الصوتي
         const audioPlayer = document.querySelector('audio');
         if (audioPlayer) {
             let currentSrc = audioPlayer.src || (audioPlayer.querySelector('source') ? audioPlayer.querySelector('source').src : "");
@@ -31,7 +34,6 @@
         }
 
         if (isHomePage) {
-            // قسم تعليقات الصفحة الرئيسية
             if (!document.getElementById("main-comments")) {
                 const mainCommentsBox = document.createElement("div");
                 mainCommentsBox.id = "main-comments";
@@ -40,12 +42,8 @@
                     <h3 style="margin-top:0; color:#ff6b6b; font-size:18px; margin-bottom: 15px;">💬 تعليقات زوار الأرشيف الباسمي</h3>
                     <div class='wbnz-comments' data-webynize-id='13869' data-page-id='index_main'></div>
                 `;
-                const topNotice = document.querySelector('div[style*="background-color: #222222"]');
-                if (topNotice && topNotice.parentNode) {
-                    topNotice.parentNode.insertBefore(mainCommentsBox, topNotice.nextSibling);
-                } else {
-                    document.body.appendChild(mainCommentsBox);
-                }
+                document.body.appendChild(mainCommentsBox);
+                loadWebynizeScript();
             }
             return;
         }
@@ -61,7 +59,7 @@
             document.body.insertBefore(backBtn, document.body.firstChild);
         }
 
-        // 3. إعلان البانر العلوي ومربع الدعم
+        // 3. الإعلانات ومربع الترحيب
         if (!document.getElementById("top-ad-box")) {
             const topAdBox = document.createElement("div");
             topAdBox.id = "top-ad-box";
@@ -75,7 +73,7 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 4. زر التحميل والسمارت لينك
+        // 4. زر التحميل
         let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download"], a[download]');
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
@@ -109,9 +107,9 @@
             });
         }
 
-        // 5. قسم التعليقات داخل صفحات القصائد
+        // 5. قسم التعليقات داخل القصيدة
         if (!document.getElementById("poem-comments")) {
-            const currentPageId = window.location.pathname.replace(/[^a-zA-Z0-9]/g, '_'); 
+            const currentPageId = window.location.pathname.replace(/[^a-zA-Z0-9]/g, '_') || 'poem_page'; 
 
             const bottomContainer = document.createElement("div");
             bottomContainer.style.cssText = "margin: 30px auto 20px auto; max-width: 600px; padding: 15px; font-family: 'Cairo', sans-serif; text-align: center;";
@@ -125,6 +123,7 @@
                 </div>
             `;
             document.body.appendChild(bottomContainer);
+            loadWebynizeScript();
         }
     }
 
