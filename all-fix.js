@@ -74,7 +74,7 @@
             }
         }
 
-        // 1. ربط مشغل الصوت بالرابط الصحيح بدقة
+        // 1. ربط مشغل الصوت بالرابط الصحيح 100%
         const audioPlayer = document.querySelector('audio');
         if (audioPlayer && mediaUrl) {
             audioPlayer.src = mediaUrl;
@@ -114,7 +114,7 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 4. زر التحميل الأحمر (إعلانين + فتح رابط التنزيل المباشر مثل النقاط الثلاثة تماماً بدون شاشة سودة)
+        // 4. زر التحميل الأحمر (فتح الإعلانات + ضبط الرابط المباشر للتحميل بدون شاشة سودة)
         let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download"], a[download]');
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
@@ -132,23 +132,23 @@
         }
 
         if (downloadBtn) {
-            downloadBtn.addEventListener('click', function (e) {
-                e.preventDefault();
+            // نربط رابط التحميل الحقيقي بالزر حتى المتصفح يعامله كملف قابل للتحميل مباشرة
+            if (mediaUrl) {
+                downloadBtn.href = mediaUrl;
+                downloadBtn.setAttribute('download', '');
+            }
 
+            downloadBtn.addEventListener('click', function (e) {
+                // لا نلغي الحدث الافتراضي (e.preventDefault) حتى يسمح للمتصفح بالتحميل النظامي، 
+                // وبنفس الوقت نفتح الإعلانين في الخلفية لطش!
+                
                 // 1. فتح الإعلان الأول
                 window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
 
-                // 2. فتح الإعلان الثاني لزيادة الأرباح[span_1](start_span)[span_1](end_span)[span_2](start_span)[span_2](end_span)
+                // 2. فتح الإعلان الثاني لزيادة الأرباح[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)
                 setTimeout(() => {
                     window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
                 }, 300);
-
-                // 3. فتح رابط الملف المباشر في تبويب جديد حتى يبدأ المتصفح بالتحميل تماماً مثل النقاط الثلاثة وبدون شاشة سودة
-                if (mediaUrl) {
-                    setTimeout(() => {
-                        window.open(mediaUrl, '_blank');
-                    }, 600);
-                }
             });
         }
 
