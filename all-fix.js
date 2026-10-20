@@ -1,6 +1,54 @@
 (function () {
     const ARCHIVE_BASE_URL = "https://archive.org/download/9_20261019_20261019_1439/";
 
+    // خريطة الربط الكاملة بين الصفحات والملفات الصوتية
+    const POEMS_DATA = [
+      { "audio": "shati-almot.m4a", "url": "shati-almot.html" },
+      { "audio": "hadar-baltaf.m4a", "url": "hadar-baltaf.html" },
+      { "audio": "sour-albnyta.m4a", "url": "sour-albnyta.html" },
+      { "audio": "shlon-asbr.m4a", "url": "shlon-asbr.html" },
+      { "audio": "alilm-aalgaa.m4a", "url": "alilm-aalgaa.html" },
+      { "audio": "yusajilni.mp3", "url": "yusajilni.html" },
+      { "audio": "7.m4a", "url": "انت-قوس-أم-هلال.html" },
+      { "audio": "8.m4a", "url": "راس-الرمح.html" },
+      { "audio": "9.m4a", "url": "اريد-انعاك-فلا-انساك.html" },
+      { "audio": "10.m4a", "url": "الله-يا-حامي-الشريعة.html" },
+      { "audio": "11.m4a", "url": "ياعباس-فكدك-هضمنه.html" },
+      { "audio": "12.m4a", "url": "يايوم-اشوف-اعتابك.html" },
+      { "audio": "13.m4a", "url": "جرى-سر-الاله.html" },
+      { "audio": "14.m4a", "url": "حرم-عندي-وحق-جدي.html" },
+      { "audio": "15.m4a", "url": "حكم-القضاء-جاري.html" },
+      { "audio": "16.m4a", "url": "دمك-يساوي-العدل-السماوي.html" },
+      { "audio": "17.m4a", "url": "صلى-عليك-مليك-السماء.html" },
+      { "audio": "18.m4a", "url": "طفلة-وشفت-بالنوم.html" },
+      { "audio": "19.m4a", "url": "ظل-يجري-دمع-العين.html" },
+      { "audio": "20.m4a", "url": "عايلة-وأيتام-من-الشام.html" },
+      { "audio": "21.m4a", "url": "قبل-ما-تروح-وتهاجر.html" },
+      { "audio": "22.m4a", "url": "كل-قطرة-دم-بشرياني.html" },
+      { "audio": "23.m4a", "url": "كوم-ارويها.html" },
+      { "audio": "24.m4a", "url": "مثل-طبع-النسر-طبعي.html" },
+      { "audio": "25.m4a", "url": "نار-قلب-العطشان.html" },
+      { "audio": "26.m4a", "url": "وسط-الكلب-ياحسين.html" },
+      { "audio": "27.m4a", "url": "يابو-السبطين.html" },
+      { "audio": "28.m4a", "url": "يبن-أمي-جارت-الدنيا.html" },
+      { "audio": "29.mp3", "url": "اخاف-من-اعوفك.html" },
+      { "audio": "30.m4a", "url": "ابد-والله-لن-ننسى-حسيناه.html" },
+      { "audio": "31.mp3", "url": "هنا-يالنازلين-هنا.html" },
+      { "audio": "32.m4a", "url": "فداء-لمثواك-من-مضجعي.html" },
+      { "audio": "33.m4a", "url": "ترفق-ايها-السيف-الصقيل.html" },
+      { "audio": "34.m4a", "url": "حضر-عندك-علي-جدك.html" },
+      { "audio": "35.mp3", "url": "ذبيح-مسلب-ابن-امي.html" },
+      { "audio": "36.mp3", "url": "زينب-لفت-يم-حسين.html" },
+      { "audio": "37.m4a", "url": "سيد-الرسل-يفتح-سجل.html" },
+      { "audio": "38.m4a", "url": "عباس-ياعيوني.html" },
+      { "audio": "39.m4a", "url": "عتابي-ياخوتي-ويامن-عتابي.html" },
+      { "audio": "40.m4a", "url": "عذبني-درب-الشام.html" },
+      { "audio": "41.m4a", "url": "علامات-الحزن.html" },
+      { "audio": "42.m4a", "url": "من-البين-ياحسين.html" },
+      { "audio": "43.m4a", "url": "هذا-الغريب-منين.html" },
+      { "audio": "44.m4a", "url": "ياحسين-من-العين.html" }
+    ];
+
     function initFixes() {
         const isHomePage = window.location.pathname === "/" || 
                            window.location.pathname.endsWith("index.html") || 
@@ -8,25 +56,41 @@
 
         if (isHomePage) return;
 
-        // 1. التقاط اسم الملف الصوتي الحقيقي المكتوب بالصفحة أو استخراجه بسلاسة
-        const audioPlayer = document.querySelector('audio');
-        let mediaUrl = "";
+        // استخراج اسم الصفحة الحالية
+        const currentPath = decodeURIComponent(window.location.pathname);
+        const pageName = currentPath.split('/').pop().trim();
 
-        if (audioPlayer) {
-            let sourceTag = audioPlayer.querySelector('source');
-            let currentSrc = audioPlayer.src || (sourceTag ? sourceTag.src : "");
-            
-            if (currentSrc) {
-                const fileName = currentSrc.split('/').pop();
-                if (fileName) {
-                    mediaUrl = ARCHIVE_BASE_URL + fileName;
-                    audioPlayer.src = mediaUrl;
-                    if (sourceTag) {
-                        sourceTag.src = mediaUrl;
-                    }
-                    audioPlayer.load();
+        // البحث عن ملف الصوت المطابق من الخريطة
+        const matchedPoem = POEMS_DATA.find(p => p.url.trim() === pageName || decodeURIComponent(p.url.trim()) === pageName);
+        
+        let mediaUrl = "";
+        if (matchedPoem) {
+            mediaUrl = ARCHIVE_BASE_URL + matchedPoem.audio;
+        } else {
+            // حل احتياطي في حال لم يجد الصفحة بالخريطة
+            const audioPlayerElem = document.querySelector('audio');
+            if (audioPlayerElem) {
+                let srcTag = audioPlayerElem.querySelector('source');
+                let existingSrc = audioPlayerElem.src || (srcTag ? srcTag.src : "");
+                if (existingSrc) {
+                    mediaUrl = ARCHIVE_BASE_URL + existingSrc.split('/').pop();
                 }
             }
+        }
+
+        // 1. ربط وتشغيل مشغل الصوت بشكل مضمون 100%
+        const audioPlayer = document.querySelector('audio');
+        if (audioPlayer && mediaUrl) {
+            audioPlayer.src = mediaUrl;
+            let sourceTag = audioPlayer.querySelector('source');
+            if (sourceTag) {
+                sourceTag.src = mediaUrl;
+            } else {
+                const newSource = document.createElement('source');
+                newSource.src = mediaUrl;
+                audioPlayer.appendChild(newSource);
+            }
+            audioPlayer.load();
         }
 
         // 2. زر العودة للرئيسية
@@ -54,8 +118,8 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 4. زر التحميل الأحمر (إعلانين لزيادة الأرباح + تنزيل مباشر بدون شاشة سودة)
-        let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download'], a[download]');
+        // 4. زر التحميل الأحمر (فتح إعلانين + تنزيل الملف المباشر بدون شاشة سودة)
+        let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download"], a[download]');
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
             noticeBox.className = 'download-notice';
@@ -66,7 +130,7 @@
             downloadBtn = document.createElement("a");
             downloadBtn.href = "#";
             downloadBtn.className = "download-link";
-            downloadBtn.innerHTML = "📥 تحميل القصيدة (M4A)";
+            downloadBtn.innerHTML = "📥 تحميل القصيدة";
             downloadBtn.style.cssText = "display: block; width: fit-content; margin: 10px auto 15px auto; background: #ff5252; color: #fff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-family: 'Cairo', sans-serif; text-align: center;";
             noticeBox.parentNode.insertBefore(downloadBtn, noticeBox.nextSibling);
         }
@@ -75,15 +139,15 @@
             downloadBtn.addEventListener('click', function (e) {
                 e.preventDefault();
 
-                // فتح الإعلان الأول
+                // 1. فتح الإعلان الأول
                 window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
 
-                // فتح الإعلان الثاني لزيادة الأرباح[span_0](start_span)[span_0](end_span)[span_1](start_span)[span_1](end_span)
+                // 2. فتح الإعلان الثاني لزيادة الأرباح
                 setTimeout(() => {
                     window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
                 }, 300);
 
-                // التحميل المباشر الآمن
+                // 3. التحميل المباشر للقصيدة
                 if (mediaUrl) {
                     setTimeout(() => {
                         const tempLink = document.createElement('a');
