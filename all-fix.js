@@ -1,4 +1,6 @@
 (function () {
+    const ARCHIVE_BASE_URL = "https://archive.org/download/9_20261019_20261019_1439/";
+
     function initFixes() {
         const isHomePage = window.location.pathname === "/" || 
                            window.location.pathname.endsWith("index.html") || 
@@ -6,16 +8,28 @@
 
         if (isHomePage) return;
 
-        // التقاط رابط الصوت الأصلي المكتوب داخل صفحة الـ HTML لكل قصيدة بدقة 100%
+        // 1. التقاط اسم الملف الصوتي الحقيقي المكتوب بالصفحة أو استخراجه بسلاسة
         const audioPlayer = document.querySelector('audio');
         let mediaUrl = "";
-        
+
         if (audioPlayer) {
             let sourceTag = audioPlayer.querySelector('source');
-            mediaUrl = audioPlayer.src || (sourceTag ? sourceTag.src : "");
+            let currentSrc = audioPlayer.src || (sourceTag ? sourceTag.src : "");
+            
+            if (currentSrc) {
+                const fileName = currentSrc.split('/').pop();
+                if (fileName) {
+                    mediaUrl = ARCHIVE_BASE_URL + fileName;
+                    audioPlayer.src = mediaUrl;
+                    if (sourceTag) {
+                        sourceTag.src = mediaUrl;
+                    }
+                    audioPlayer.load();
+                }
+            }
         }
 
-        // 1. زر العودة للرئيسية
+        // 2. زر العودة للرئيسية
         let backBtn = document.querySelector('.back-link, .btn-back, a[href*="index"], a[href="/"]');
         if (!backBtn) {
             backBtn = document.createElement("a");
@@ -26,7 +40,7 @@
             document.body.insertBefore(backBtn, document.body.firstChild);
         }
 
-        // 2. الإعلانات ومربع الترحيب
+        // 3. الإعلانات ومربع الترحيب
         if (!document.getElementById("top-ad-box")) {
             const topAdBox = document.createElement("div");
             topAdBox.id = "top-ad-box";
@@ -40,8 +54,8 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 3. زر التحميل الأحمر (إعلانين + تحميل مباشر بدون شاشة سودة)
-        let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download"], a[download]');
+        // 4. زر التحميل الأحمر (إعلانين لزيادة الأرباح + تنزيل مباشر بدون شاشة سودة)
+        let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download'], a[download]');
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
             noticeBox.className = 'download-notice';
@@ -64,12 +78,12 @@
                 // فتح الإعلان الأول
                 window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
 
-                // فتح الإعلان الثاني لزيادة الأرباح[span_5](start_span)[span_5](end_span)[span_6](start_span)[span_6](end_span)
+                // فتح الإعلان الثاني لزيادة الأرباح[span_0](start_span)[span_0](end_span)[span_1](start_span)[span_1](end_span)
                 setTimeout(() => {
                     window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
                 }, 300);
 
-                // التحميل المباشر للملف الصوتي الحقيقي الخاص بالقصيدة
+                // التحميل المباشر الآمن
                 if (mediaUrl) {
                     setTimeout(() => {
                         const tempLink = document.createElement('a');
@@ -84,7 +98,7 @@
             });
         }
 
-        // 4. تعليقات صفحات القصائد بارتفاع 340px
+        // 5. تعليقات صفحات القصائد بارتفاع 340px
         if (!document.getElementById("poem-comments-box")) {
             const bottomContainer = document.createElement("div");
             bottomContainer.id = "poem-comments-box";
