@@ -1,7 +1,6 @@
 (function () {
     const ARCHIVE_BASE_URL = "https://archive.org/download/9_20261019_20261019_1439/";
 
-    // خريطة الربط الكاملة بين الصفحات والملفات الصوتية
     const POEMS_DATA = [
       { "audio": "shati-almot.m4a", "url": "shati-almot.html" },
       { "audio": "hadar-baltaf.m4a", "url": "hadar-baltaf.html" },
@@ -56,18 +55,15 @@
 
         if (isHomePage) return;
 
-        // استخراج اسم الصفحة الحالية
         const currentPath = decodeURIComponent(window.location.pathname);
         const pageName = currentPath.split('/').pop().trim();
 
-        // البحث عن ملف الصوت المطابق من الخريطة
         const matchedPoem = POEMS_DATA.find(p => p.url.trim() === pageName || decodeURIComponent(p.url.trim()) === pageName);
         
         let mediaUrl = "";
         if (matchedPoem) {
             mediaUrl = ARCHIVE_BASE_URL + matchedPoem.audio;
         } else {
-            // حل احتياطي في حال لم يجد الصفحة بالخريطة
             const audioPlayerElem = document.querySelector('audio');
             if (audioPlayerElem) {
                 let srcTag = audioPlayerElem.querySelector('source');
@@ -78,7 +74,7 @@
             }
         }
 
-        // 1. ربط وتشغيل مشغل الصوت بشكل مضمون 100%
+        // 1. ربط مشغل الصوت بالرابط الصحيح بدقة
         const audioPlayer = document.querySelector('audio');
         if (audioPlayer && mediaUrl) {
             audioPlayer.src = mediaUrl;
@@ -118,7 +114,7 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 4. زر التحميل الأحمر (فتح إعلانين + تنزيل الملف المباشر بدون شاشة سودة)
+        // 4. زر التحميل الأحمر (إعلانين + فتح رابط التنزيل المباشر مثل النقاط الثلاثة تماماً بدون شاشة سودة)
         let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download"], a[download]');
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
@@ -142,21 +138,15 @@
                 // 1. فتح الإعلان الأول
                 window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
 
-                // 2. فتح الإعلان الثاني لزيادة الأرباح
+                // 2. فتح الإعلان الثاني لزيادة الأرباح[span_1](start_span)[span_1](end_span)[span_2](start_span)[span_2](end_span)
                 setTimeout(() => {
                     window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
                 }, 300);
 
-                // 3. التحميل المباشر للقصيدة
+                // 3. فتح رابط الملف المباشر في تبويب جديد حتى يبدأ المتصفح بالتحميل تماماً مثل النقاط الثلاثة وبدون شاشة سودة
                 if (mediaUrl) {
                     setTimeout(() => {
-                        const tempLink = document.createElement('a');
-                        tempLink.href = mediaUrl;
-                        tempLink.setAttribute('download', '');
-                        tempLink.setAttribute('target', '_blank');
-                        document.body.appendChild(tempLink);
-                        tempLink.click();
-                        document.body.removeChild(tempLink);
+                        window.open(mediaUrl, '_blank');
                     }, 600);
                 }
             });
