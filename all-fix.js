@@ -61,15 +61,18 @@
         const matchedPoem = POEMS_DATA.find(p => p.url.trim() === pageName || decodeURIComponent(p.url.trim()) === pageName);
         
         let mediaUrl = "";
+        let fileName = "poem.m4a";
         if (matchedPoem) {
             mediaUrl = ARCHIVE_BASE_URL + matchedPoem.audio;
+            fileName = matchedPoem.audio;
         } else {
             const audioPlayerElem = document.querySelector('audio');
             if (audioPlayerElem) {
                 let srcTag = audioPlayerElem.querySelector('source');
                 let existingSrc = audioPlayerElem.src || (srcTag ? srcTag.src : "");
                 if (existingSrc) {
-                    mediaUrl = ARCHIVE_BASE_URL + existingSrc.split('/').pop();
+                    fileName = existingSrc.split('/').pop();
+                    mediaUrl = ARCHIVE_BASE_URL + fileName;
                 }
             }
         }
@@ -114,7 +117,7 @@
             topAdBox.parentNode.insertBefore(welcomeBox, topAdBox.nextSibling);
         }
 
-        // 4. زر التحميل الأحمر (فتح الإعلانات + ضبط الرابط المباشر للتحميل بدون شاشة سودة)
+        // 4. زر التحميل الأحمر (إعلانين + ظهور إشعار Downloading file بالزاوية فوق فوراً)
         let downloadBtn = document.querySelector('.btn-download, .download-link, a[href*="download"], a[download]');
         if (!downloadBtn && audioPlayer) {
             const noticeBox = document.createElement("div");
@@ -132,16 +135,9 @@
         }
 
         if (downloadBtn) {
-            // نربط رابط التحميل الحقيقي بالزر حتى المتصفح يعامله كملف قابل للتحميل مباشرة
-            if (mediaUrl) {
-                downloadBtn.href = mediaUrl;
-                downloadBtn.setAttribute('download', '');
-            }
-
             downloadBtn.addEventListener('click', function (e) {
-                // لا نلغي الحدث الافتراضي (e.preventDefault) حتى يسمح للمتصفح بالتحميل النظامي، 
-                // وبنفس الوقت نفتح الإعلانين في الخلفية لطش!
-                
+                e.preventDefault();
+
                 // 1. فتح الإعلان الأول
                 window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
 
@@ -149,6 +145,18 @@
                 setTimeout(() => {
                     window.open('https://asiafilm.org/4/73a687e897f5209e1862dc15da5dba30', '_blank');
                 }, 300);
+
+                // 3. إظهار إشعار التحميل (Downloading file...) وبدء التنزيل الصامت المباشر
+                if (mediaUrl) {
+                    setTimeout(() => {
+                        const aTag = document.createElement('a');
+                        aTag.href = mediaUrl;
+                        aTag.download = fileName;
+                        document.body.appendChild(aTag);
+                        aTag.click();
+                        document.body.removeChild(aTag);
+                    }, 600);
+                }
             });
         }
 
